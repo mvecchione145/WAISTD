@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-deployment
+  labels:
+    app: fastapi-app
+spec:
+  replicas: 3  # Number of replicas to deploy
+  selector:
+    matchLabels:
+      app: fastapi-app
+  template:
+    metadata:
+      labels:
+        app: fastapi-app
+    spec:
+      containers:
+      - name: fastapi-container
+        image: waistd-dev:latest  # Replace with your Docker image and tag
+        ports:
+        - containerPort: 80  # FastAPI's default port
+        env:
+        - name: ENVIRONMENT
+          value: "dev"  # Example environment variable
+        readinessProbe:
+          httpGet:
+            path: "/health"
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: "/health"
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+  labels:
+    app: fastapi-app
+spec:
+  selector:
+    app: fastapi-app
+  ports:
+  - protocol: TCP
+    port: 80  # Port exposed by the service
+    targetPort: 80  # Port the application listens to inside the container
+  type: LoadBalancer  # Exposes the service externally
