@@ -17,6 +17,7 @@ spec:
       containers:
       - name: fastapi-container
         image: waistd-dev:latest  # Replace with your Docker image and tag
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80  # FastAPI's default port
         env:
@@ -25,13 +26,13 @@ spec:
         readinessProbe:
           httpGet:
             path: "/health"
-            port: 8000
+            port: 80
           initialDelaySeconds: 5
           periodSeconds: 10
         livenessProbe:
           httpGet:
             path: "/health"
-            port: 8000
+            port: 80
           initialDelaySeconds: 15
           periodSeconds: 20
 ---

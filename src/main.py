@@ -22,5 +22,5 @@ def set_config(id: int, payload: Any) -> Any:
 
 
 @app.get("/health")
-def get_health(id: int, payload: Any) -> Any:
+def get_health() -> Any:
     return "Success"
