@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: waistd-deployment
+  labels:
+    app: waistd-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: waistd-app
+  template:
+    metadata:
+      labels:
+        app: waistd-app
+    spec:
+      containers:
+      - name: waistd-container
+        image: waistd-dev:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        env:
+        - name: ENVIRONMENT
+          value: "dev"
+        readinessProbe:
+          httpGet:
+            path: "/health"
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: "/health"
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: waistd-service
+  labels:
+    app: waistd-app
+spec:
+  selector:
+    app: waistd-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
